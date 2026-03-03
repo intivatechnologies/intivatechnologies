@@ -4,7 +4,9 @@
 
 using namespace std;
 
-class TextTree {
-public:
-	static string startAt(const char* root);
-};
+namespace text_tree {
+	class TextTree {
+	public:
+		static string startAt(const char* root);
+	};
+}

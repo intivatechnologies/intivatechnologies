@@ -6,6 +6,7 @@
 #include "text_tree/text_tree.hpp"
 
 using namespace std;
+using namespace text_tree;
 
 static vector<string> includeForFileContents;
 static map<string, string> fileContents;
