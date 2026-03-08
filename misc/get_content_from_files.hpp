@@ -18,6 +18,8 @@ vector<string> getContentFromFiles(const vector<string>& fileRoots) {
 		ostringstream buffer;
 		buffer << file.rdbuf();
 		contents.push_back(buffer.str());
+
+		file.close();
 	}
 
 	return contents;
