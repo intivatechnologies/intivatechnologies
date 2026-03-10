@@ -14,85 +14,15 @@
 #include "traversals/traversals_string_tree.hpp"
 #include "misc/get_content_from_files.hpp"
 #include "misc/get_root_name.hpp"
+#include "client/parse_flags.hpp"
+#include "test_repurposing/tests.hpp"
 
 using namespace std;
 using namespace file_records;
+using namespace client;
+using namespace test_repurposing;
 
-void throwErr(string reasonInp) {
-	throw "Your input failed to specify " + reasonInp + ".";
-}
-
-struct Config {
-	map<string, vector<string>> flags;
-
-	enum ModeFlag {
-		MF_NONE = 0,
-		MF_STRUCTURE = 1 << 0,
-		MF_CONTENT = 1 << 1
-	} MODE_FLAG = ModeFlag::MF_NONE;
-
-	void reset() {
-		flags.clear();
-		MODE_FLAG = MF_NONE;
-	}
-};
-
-//populate static map flags 'flags' with all flags and tags
-Config parseFlags(const int FLAGS_INDEX, int argc, char* argv[]) {
-	Config conf;
-
-	string currentFlag = "";
-	for (int i = FLAGS_INDEX; i < argc; i++) {
-		string token = argv[i];
-		if (token == "\\")
-			continue;
-
-		//process for --flags
-		if (token.rfind("--", 0) == 0)
-		{
-			currentFlag = token.substr(2);
-			conf.flags[currentFlag]; // ensure key exists
-		}
-
-		//process for tags
-		else
-			conf.flags[currentFlag].push_back(token);
-	}
-
-	return conf;
-}
-
-//assign tags and refine where needed
-void installFlags(Config& conf, const map<string, vector<string>>::iterator FLAG_INCLUDE_EXTENSIONS_ITER) {
-	//ensure file extensions have a dot char at the beginning
-	if (FLAG_INCLUDE_EXTENSIONS_ITER != conf.flags.end())
-		for (auto& tag : FLAG_INCLUDE_EXTENSIONS_ITER->second) {
-			if (tag[0] != '.')
-				tag.insert(tag.begin(), '.');
-		}
-
-	//extract one or modes into K_MODE
-	auto modeIter = conf.flags.find(K_MODE);
-	if (modeIter != conf.flags.end())
-		for (auto& m : modeIter->second) {
-			if (m == "structure")
-				conf.MODE_FLAG = (Config::ModeFlag)(conf.MODE_FLAG | conf.MF_STRUCTURE);
-
-			if (m == "content")
-				conf.MODE_FLAG = (Config::ModeFlag)(conf.MODE_FLAG | conf.MF_CONTENT);
-		}
-
-	//print all flags and tags
-	for (const auto& pair : conf.flags) {
-		cout << "--" << pair.first;
-		for (const auto& tag : conf.flags.at(pair.first))
-			cout << ' ' << tag;
-		cout << endl;
-	}
-	cout << endl;
-}
-
-void runListTreeCheck(Config& conf, FilesystemNode& rootNode) {
+void runListTreeCheck(Flags& conf, FilesystemNode& rootNode) {
 	if (conf.MODE_FLAG & conf.MF_STRUCTURE) {
 		//list the tree
 		string tree = rootNode.name + '\n';
@@ -101,7 +31,7 @@ void runListTreeCheck(Config& conf, FilesystemNode& rootNode) {
 	}
 }
 
-bool runContentExtensionsCheckValidation(Config& conf, const map<string, vector<string>>
+bool runContentExtensionsCheckValidation(Flags& conf, const map<string, vector<string>>
 ::iterator FLAG_INCLUDE_EXTENSIONS_ITER) {
 	if (FLAG_INCLUDE_EXTENSIONS_ITER != conf.flags.end()
 		&& FLAG_INCLUDE_EXTENSIONS_ITER->second.size() > 0) {
@@ -112,16 +42,18 @@ bool runContentExtensionsCheckValidation(Config& conf, const map<string, vector<
 		return true;
 	}
 	else {
-		throwErr("file extensions to dedicate for extraction");
+		TestUtil::throwErr("file extensions to dedicate for extraction");
 		return false;
 	}
 }
 
 int main(int argc, char* argv[]) {
+	//AssignedTests::runTests();
+
 	const int FLAGS_INDEX = 1;
 
 	if (argc > FLAGS_INDEX) {
-		Config conf = parseFlags(FLAGS_INDEX, argc, argv);
+		Flags conf = parseFlags(FLAGS_INDEX, argc, argv);
 
 		const auto FLAG_INCLUDE_EXTENSIONS_ITER = conf.flags.find(K_INCLUDE_EXT);
 		installFlags(conf, FLAG_INCLUDE_EXTENSIONS_ITER);

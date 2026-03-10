@@ -11,7 +11,10 @@ set(SOURCES
     "file_records/filesystem_node.hpp"
     "file_records/filesystem_node.cpp"
     "traversals/traversals_content_roots.hpp"
-    "traversals/traversals_string_tree.hpp")
+    "traversals/traversals_string_tree.hpp"
+    "test_repurposing/test_util.hpp"
+    "test_repurposing/tests.hpp"
+    "client/parse_flags.hpp")
 
 # The TREE argument mirrors your disk folders into VS filters
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SOURCES})
