@@ -52,9 +52,7 @@ namespace test_repurposing {
 			auto argv = TestUtil::makeArgv(args);
 
 			Flags conf = parseFlags(argv.size(), argv.data());
-
-			auto it = conf.flags.find(K_INCLUDE_EXT);
-			installFlags(conf, it);
+			installFlags(conf);
 
 			TestUtil::assertTrue(conf.flags[K_INCLUDE_EXT][0] == ".yml", "yml normalized");
 			TestUtil::assertTrue(conf.flags[K_INCLUDE_EXT][1] == ".hpp", "hpp unchanged");
@@ -71,9 +69,7 @@ namespace test_repurposing {
 			auto argv = TestUtil::makeArgv(args);
 
 			Flags conf = parseFlags(argv.size(), argv.data());
-
-			auto it = conf.flags.find(K_INCLUDE_EXT);
-			installFlags(conf, it);
+			installFlags(conf);
 
 			TestUtil::assertTrue(conf.MODE_FLAG & Flags::MF_STRUCTURE, "structure mode flag set");
 			TestUtil::assertTrue(conf.MODE_FLAG & Flags::MF_CONTENT, "content mode flag set");

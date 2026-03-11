@@ -1,11 +1,12 @@
-#define K_INCLUDE_EXT "include-ext"
-#define K_EXCLUDE_DIR "exclude-dir"
-#define K_MODE "mode"
-#define K_ROOT "root"
+constexpr const char* K_INCLUDE_EXT = "include-ext";
+constexpr const char* K_EXCLUDE_DIR = "exclude-dir";
+constexpr const char* K_MODE = "mode";
+constexpr const char* K_ROOT = "root";
 
 #include <iostream>
 #include <vector>
 #include <map>
+
 #include <string>
 #include <filesystem>
 
@@ -31,12 +32,11 @@ void presentStructureTreeIfPrompted(Flags& conf, FilesystemNode& rootNode) {
 	}
 }
 
-bool presentContentsIfPrompted(Flags& conf, map<string, vector<string>>
-::iterator FLAG_INCLUDE_EXTENSIONS_ITER, FilesystemNode& rootNode) {
+bool presentContentsIfPrompted(Flags& conf, FilesystemNode& rootNode) {
 	if (conf.MODE_FLAG & conf.MF_CONTENT) {
 		//list all roots with extensions that are dedicated to content extraction
 		vector<string> contentRoots;
-		traverseContentRootsByExtension(contentRoots, rootNode, FLAG_INCLUDE_EXTENSIONS_ITER->second);
+		traverseContentRootsByExtension(contentRoots, rootNode, conf.flags[K_INCLUDE_EXT]);
 
 		cout << endl << "> CONTENT ROOTS:" << endl;
 		for (string contentRoot : contentRoots)
@@ -58,12 +58,10 @@ bool presentContentsIfPrompted(Flags& conf, map<string, vector<string>>
 		return false;
 }
 
-bool checkThatContentExtensionsAreAvailable(Flags& conf, const map<string, vector<string>>
-::iterator FLAG_INCLUDE_EXTENSIONS_ITER) {
-	if (FLAG_INCLUDE_EXTENSIONS_ITER != conf.flags.end()
-		&& FLAG_INCLUDE_EXTENSIONS_ITER->second.size() > 0) {
+bool checkThatContentExtensionsAreAvailable(Flags& conf) {
+	if (conf.has(K_INCLUDE_EXT) && conf.flags[K_INCLUDE_EXT].size() > 0) {
 		cout << "> CONTENT EXTENSIONS:" << endl;
-		for (auto& contentExtension : FLAG_INCLUDE_EXTENSIONS_ITER->second)
+		for (auto& contentExtension : conf.flags[K_INCLUDE_EXT])
 			cout << '-' << contentExtension << endl;
 
 		return true;
@@ -79,9 +77,7 @@ int main(int argc, char* argv[]) {
 
 	if (argc > 1) {
 		Flags conf = parseFlags(argc, argv);
-
-		const auto FLAG_INCLUDE_EXTENSIONS_ITER = conf.flags.find(K_INCLUDE_EXT);
-		installFlags(conf, FLAG_INCLUDE_EXTENSIONS_ITER);
+		installFlags(conf);
 
 		auto rootIter = conf.flags.find(K_ROOT);
 		if (rootIter != conf.flags.end()) {
@@ -94,9 +90,9 @@ int main(int argc, char* argv[]) {
 			rootNode.buildOut(conf.flags.at(K_EXCLUDE_DIR));
 			presentStructureTreeIfPrompted(conf, rootNode);
 
+			
 			//present the contents
-			if (checkThatContentExtensionsAreAvailable(conf, FLAG_INCLUDE_EXTENSIONS_ITER)
-				&& presentContentsIfPrompted(conf, FLAG_INCLUDE_EXTENSIONS_ITER, rootNode));
+			//if (checkThatContentExtensionsAreAvailable(conf) && presentContentsIfPrompted(conf, rootNode));
 		}
 	}
 

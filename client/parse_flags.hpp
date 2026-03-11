@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <map>
 #include <string>
 #include <vector>
@@ -16,6 +15,10 @@ namespace client {
 			MF_STRUCTURE = 1 << 0,
 			MF_CONTENT = 1 << 1
 		} MODE_FLAG = ModeFlag::MF_NONE;
+
+		bool has(const string& key) const {
+			return flags.find(key) != flags.end();
+		}
 	};
 
 	/*
@@ -72,25 +75,22 @@ namespace client {
 	}
 
 	//assign tags and refine where needed
-	void installFlags(Flags& conf, const map<string, vector<string>>
-	::iterator FLAG_INCLUDE_EXTENSIONS_ITER) {
+	void installFlags(Flags& conf) {
 		//ensure file extensions have a dot char at the beginning
-		if (FLAG_INCLUDE_EXTENSIONS_ITER != conf.flags.end())
-			for (auto& tag : FLAG_INCLUDE_EXTENSIONS_ITER->second) {
-				if (tag[0] != '.')
-					tag.insert(tag.begin(), '.');
-			}
+		for (int i = 0; i < conf.flags[K_INCLUDE_EXT].size(); i++) {
+			if(conf.flags[K_INCLUDE_EXT][i][0] != '.')
+				conf.flags[K_INCLUDE_EXT][i] = '.' + conf.flags[K_INCLUDE_EXT][i];
+		}
 
 		//extract one or modes into K_MODE
-		auto modeIter = conf.flags.find(K_MODE);
-		if (modeIter != conf.flags.end())
-			for (auto& m : modeIter->second) {
-				if (m == "structure")
-					conf.MODE_FLAG = (Flags::ModeFlag)(conf.MODE_FLAG | conf.MF_STRUCTURE);
+		vector<string> modes = conf.flags[K_MODE];
+		for (auto& m : modes) {
+			if (m == "structure")
+				conf.MODE_FLAG = (Flags::ModeFlag)(conf.MODE_FLAG | conf.MF_STRUCTURE);
 
-				if (m == "content")
-					conf.MODE_FLAG = (Flags::ModeFlag)(conf.MODE_FLAG | conf.MF_CONTENT);
-			}
+			if (m == "content")
+				conf.MODE_FLAG = (Flags::ModeFlag)(conf.MODE_FLAG | conf.MF_CONTENT);
+		}
 
 		//print all flags and tags
 		//printAllFlagsAndTags(conf);
