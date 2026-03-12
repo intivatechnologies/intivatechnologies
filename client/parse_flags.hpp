@@ -3,6 +3,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <string_view>
+#include <stdexcept>
 
 using namespace std;
 
@@ -19,9 +21,34 @@ namespace client {
 		bool has(const string& key) const {
 			return flags.find(key) != flags.end();
 		}
+
+		void parse(int argc, char* argv[]) {
+			string currentFlag;
+			const string escapes = "\\\"'\n\t\r";
+
+			for (int i = 0; i < argc; ++i) {
+				string_view token = argv[i];
+				if (token.empty()) continue;
+
+				// 1. Simplified Escape Character Check
+				if (escapes.find(token.front()) != string::npos ||
+					escapes.find(token.back()) != string::npos) {
+					throw runtime_error("Tokens cannot start or end with escape characters.");
+				}
+
+				// 2. Process for --flags
+				if (token.rfind("--", 0) == 0) {
+					currentFlag = token.substr(2);
+					flags[currentFlag]; // Ensure key exists
+				}
+
+				// 3. Process for tags (values)
+				else if (!currentFlag.empty())
+					flags[currentFlag].emplace_back(token);
+			}
+		}
 	};
 
-	/*
 	void printAllFlagsAndTags(const Flags& conf) {
 		for (const auto& pair : conf.flags) {
 			cout << "--" << pair.first;
@@ -31,40 +58,10 @@ namespace client {
 		}
 		cout << endl;
 	}
-	*/
 
 	Flags parseAndInstallFlags(int argc, char* argv[]) {
 		Flags conf;
-
-		auto compareToEscapeCharacter = [](char beingCompared) {
-			char escapeCharacters[] = { '\\', '\"', '\'', '\n', '\t', '\r' };
-			for (char escapeChar : escapeCharacters)
-				if (beingCompared == escapeChar)
-					return true;
-			return false;
-		};
-
-		string currentFlag = "";
-		for (int i = 0; i < argc; i++) {
-			string token = argv[i];
-			//cout << "argv[" << (i+1) << "/" << argc << "]: \"" << token << "\"" << endl;
-			if (compareToEscapeCharacter(token[0]) || compareToEscapeCharacter(token[token.size() - 1]))
-				throw "None of your tokens may contain an escape character in their rvalue or lvalue.";
-
-			if (!token.empty()) {
-				//process for --flags
-				if (token.rfind("--", 0) == 0) {
-					currentFlag = token.substr(2);
-					conf.flags[currentFlag]; // ensure key exists
-				}
-
-				//process for tags
-				else if (currentFlag.size() > 0) {
-					conf.flags[currentFlag].push_back(token);
-					//cout << "Added tag \"" << token << "\" to flag \"--" << currentFlag << "\"" << endl;
-				}
-			}
-		}
+		conf.parse(argc, argv);
 
 		//ensure file extensions have a dot char at the beginning
 		for (int i = 0; i < conf.flags[K_INCLUDE_EXT].size(); i++) {
