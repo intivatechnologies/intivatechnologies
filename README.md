@@ -1,3 +1,5 @@
+# NOTE: this project is not yet finished, so the following is just a demonstration of concept, not production.
+
 # Welcome to a done-for-AI clipboard program
 This is a program for use between your project and your GPT
 to provide structural evidence and insight into how your project
