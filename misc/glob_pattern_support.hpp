@@ -13,6 +13,7 @@ enum GLOB_PATTERN {
 	FOLDER_MATCH_WHERE_VALUE_AT_END, //Matches any file or folder that ends with value (e.g. '*.git/')
 	FOLDER_MATCH_WHERE_VALUE_AT_START, //Matches any file or folder that starts with with value (e.g. '.git*/')
 
+    //Matches any file or folder that starts within with folder (e.g. '.git/*')
 	FOLDER_MATCH_WHERE_VALUE_AT_INSIDE,
 
 	DIRECT_MATCH,

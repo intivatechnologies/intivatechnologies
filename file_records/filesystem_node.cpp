@@ -2,10 +2,11 @@
 
 using namespace file_records;
 
-bool matchesPattern(string pattern, string epfs, string parentEpfs, bool isDirectory) {
+bool matchesPattern(string pattern, filesystem::directory_entry& entry) {
     // Pattern ends with '/*' -> match contents of a folder (applied at parent level, skip here)
     // We handle this by checking if the entry's parent matches the folder pattern
     // e.g. folder_name/* or *folder_name/* or folder_name*/*
+    /*
     if (pattern.size() >= 2 && pattern.substr(pattern.size() - 2) == "/*") {
         string folderPart = pattern.substr(0, pattern.size() - 2); // strip trailing /*
 
@@ -68,22 +69,27 @@ bool matchesPattern(string pattern, string epfs, string parentEpfs, bool isDirec
         // exact match
         return epfs == pattern;
     }
+    */
+
+    return false;
 }
 
-void FilesystemNode::buildOut(const vector<string>& patterns) {
+void FilesystemNode::buildOut(const const map<string, vector<string>>& directoryTable) {
 	for (filesystem::directory_entry entry : filesystem::directory_iterator(path)) {
+        /*
 		bool excluded = false;
 		for (const string& pattern : patterns) 
-			if (matchesPattern(pattern, entry.path().filename().string(),
-            entry.path().parent_path().filename().string(), entry.is_directory())) {
+			if (matchesPattern(pattern, entry)) {
 				excluded = true;
 				break;
 			}
-		if (excluded) continue;
 
-		FilesystemNode entryNode(entry);
-		if (entry.is_directory())
-			entryNode.buildOut(patterns);
-		children.push_back(entryNode);
+        if (!excluded) {
+            FilesystemNode entryNode(entry);
+            if (entry.is_directory())
+                entryNode.buildOut(patterns);
+            children.push_back(entryNode);
+        }
+        */
 	}
 }

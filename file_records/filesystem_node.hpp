@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <filesystem>
 
 using namespace std;
@@ -22,7 +23,7 @@ namespace file_records {
 				extension = directoryEntry.path().extension().string();
 		}
 
-		void buildOut(const vector<string>& patterns);
+		void buildOut(const map<string, vector<string>>& directoryTable);
 	};
 }
 

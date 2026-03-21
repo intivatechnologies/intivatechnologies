@@ -102,7 +102,7 @@ namespace client {
 		}
 
 		//print all flags and tags
-		printAllFlagsAndTags(conf);
+		//printAllFlagsAndTags(conf);
 
 		return conf;
 	}
